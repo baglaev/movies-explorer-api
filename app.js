@@ -34,7 +34,7 @@ app.get('/crash-test', () => {
 
 app.use(limiter);
 // app.options('*', cors(corsOptions));
-app.use(cors({ origin: ['https://api.bglvssh.diploma.nomoredomainsrocks.ru/', 'http://api.bglvssh.diploma.nomoredomainsrocks.ru/', 'http://localhost:3001'], credentials: true }));
+app.use(cors({ origin: ['https://bglvssh.diploma.nomoredomainsrocks.ru/', 'http://bglvssh.diploma.nomoredomainsrocks.ru/', 'http://localhost:3001'], credentials: true }));
 // app.use(cors());
 
 app.use(bodyParser.json());
