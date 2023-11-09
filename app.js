@@ -13,7 +13,7 @@ const errorHandler = require('./middlewares/error-handler');
 const { validateUserAuthentication, validateUserInfo } = require('./middlewares/validateUser');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const { PORT = 3003, DB_URL = 'mongodb://127.0.0.1:27017/diploma' } = process.env;
+const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/diploma' } = process.env;
 
 const app = express();
 
