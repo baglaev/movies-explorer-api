@@ -1,7 +1,7 @@
 {
   "name": "movies-explorer-api",
   "version": "1.0.0",
-  "description": "Diploma",
+  "description": "diploma",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
@@ -9,7 +9,7 @@
     "lint": "npx eslint ."
   },
   "keywords": [],
-  "author": "Irina Kot",
+  "author": "baglaev",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
