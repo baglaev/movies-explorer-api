@@ -3,67 +3,30 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const { errors } = require('celebrate');
+const cookies = require('cookie-parser');
 const cors = require('cors');
-const { login, createUser } = require('./controllers/user');
-const { auth } = require('./middlewares/auth');
-const NotFoundError = require('./errors/NotFoundError');
-const errorHandler = require('./middlewares/error-handler');
-const { validateUserAuthentication, validateUserInfo } = require('./middlewares/validateUser');
-const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { errors } = require('celebrate');
 
-const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/diploma' } = process.env;
+const rateLimiter = require('./middlewares/rateLimiter');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+const error = require('./middlewares/err');
+const router = require('./routes/index');
+const { DB_URL } = require('./utils/config');
+
+const { PORT = 3000 } = process.env;
 
 const app = express();
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 100,
-  max: 100,
-});
-
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
-// const corsOptions = {
-//   origin: 'http://localhost:3001',
-//   credentials: true,
-// };
-
-app.use(limiter);
-
-app.use(cors({ origin: ['https://bglvssh.diploma.nomoredomainsrocks.ru', 'http://bglvssh.diploma.nomoredomainsrocks.ru', 'http://localhost:3001'], credentials: true }));
-// app.use(cors());
-
+app.use(cookies());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+mongoose.connect(DB_URL);
 app.use(helmet());
-
-mongoose.connect(DB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
+app.disable('x-powered-by');
+app.use(cors({ origin: ['https://bglvssh.diploma.nomoredomainsrocks.ru', 'http://bglvssh.diploma.nomoredomainsrocks.ru', 'http://localhost:3001', 'http://localhost:3000', 'http://localhost:3002'], credentials: true }));
+// app.use(cors());
+app.use(rateLimiter);
 app.use(requestLogger);
-
-app.post('/signin', validateUserAuthentication, login);
-app.post('/signup', validateUserInfo, createUser);
-
-app.use(auth);
-
-app.use('/users', require('./routes/user'));
-app.use('/movies', require('./routes/movie'));
-
-app.use('*', () => { throw new NotFoundError('Ресурс не найден.'); });
-
+app.use(router);
 app.use(errorLogger);
-
 app.use(errors());
-
-app.use(errorHandler);
-
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
+app.use(error);
+app.listen(PORT);
